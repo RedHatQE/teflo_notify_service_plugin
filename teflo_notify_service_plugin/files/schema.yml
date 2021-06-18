@@ -1,0 +1,132 @@
+# default schema for the notify_service plugin
+---
+type: map
+allowempty: True
+mapping:
+  message_body:
+    required: False
+    type: any
+  params:
+    type: map
+    mapping:
+      subject:
+        required: True
+        type: str
+      target:
+        required: True
+        type: str
+        func: check_targets
+      email_template_name:
+        type: str
+      email_template_url:
+        type: str
+      email_to:
+        type: seq
+        sequence:
+          - type: str
+      gchat_template_name:
+        type: str
+      gchat_template_url:
+        type: str
+      slack_template_name:
+        type: str
+      slack_template_url:
+        type: str
+      message_bus_topic:
+        type: str
+      message_bus_request_body:
+        type: any
+      irc_channel:
+        type: str
+  credential:
+    type: map
+    allowempty: True
+    mapping:
+      gchat_url:
+        type: any
+      slack_url:
+        type: any
+      service_api:
+        type: str
+        required: True
+      token:
+        type: any
+        required: True
+
+
+#type: map
+#allowempty: True
+#mapping:
+#  subject:
+#    required: True
+#    type: str
+#  message_body:
+#    required: False
+#    type: str
+#  targets:
+#    required: True
+#    type: map
+#    mapping:
+#      email:
+#        type: map
+#        mapping:
+#          template_name:
+#            type: str
+#          template_url:
+#            type: str
+#          email_to:
+#            type: seq
+#            sequence:
+#              - type: str
+#        gchat:
+#          type: map
+#          mapping:
+#            template_name:
+#              type: str
+#            template_url:
+#              type: str
+#        slack:
+#          type: map
+#          mapping:
+#            template_name:
+#              type: str
+#            template_url:
+#              type: str
+#        message_bus:
+#          type: map
+#          mapping:
+#            message_bus_topic:
+#              type: str
+#        irc:
+#          type: map
+#          mapping:
+#            channel:
+#              type: str
+#              function: check_irc #starts with a hash # symbol
+#            message:
+#              type: str
+#  credential:
+#    type: map
+#    allowempty: True
+#    mapping:
+#      gchat_url:
+#        type: any
+#      slack_url:
+#        type: any
+#      service_api:
+#        type: str
+#        required: True
+#      token:
+#        type: any
+#        required: True
+
+
+#  - name: test_notify_service
+#    notifier: notify_service
+#    credential: notify_service
+#    on_task: ['provision']
+#    target: ['gchat']
+#    subject: test gchat
+#    gchat_template: temp1.jinja
+#    slack_template: ''
+#

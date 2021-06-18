@@ -1,0 +1,9 @@
+include CHANGES LICENSE AUTHORS README.md
+recursive-include teflo_notify_service_plugin/files *
+recursive-include teflo_notify_service_plugin/templates *
+exclude setup.cfg
+prune docs/
+prune tests/.cache
+prune .git
+prune .gitignore
+
