@@ -20,7 +20,6 @@ All contributors should create new work branches off the `develop` and request a
 Lets first clone the source code
 ```bash
 git clone https://github.com/RedHatQE/teflo_notify_service_plugin.git
-
 ```
 
 Next lets create a Python virtual environment for teflo. This assumes you have virtualenv package installed.
