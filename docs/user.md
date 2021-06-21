@@ -7,6 +7,7 @@
 ### Before Install
 In order to use this plugin, user has to setup notify service. Please visit [here](https://github.com/waynesun09/notify-service)
 to get more inforation. 
+User will also need teflo installed
 
 **Note** 
 
@@ -48,7 +49,7 @@ unique token
 Within teflo scenario descriptor file (SDF) following attributes that can be set for
 notification block for notify_service 
 
-```bash
+```yaml
 notifications:
   - name: test_notify_service
     notifier: notify_service
@@ -116,7 +117,7 @@ notifications:
   </tr>
    <tr>
     <td class="tg-14gg">target</td>
-    <td class="tg-14gg">A comma separated string of targets</span> </td>
+    <td class="tg-14gg">A comma separated string of targets</td>
     <td class="tg-14gg">String </td>
     <td class="tg-14gg">True</td>
     <td class="tg-14gg"> Valid values : gchat,slack,email,message_bus,irc. Atleast one target value is required</td>
@@ -147,8 +148,7 @@ notifications:
     <td class="tg-14gg">name of the template present on the notify_service server</td>
     <td class="tg-14gg">String</td>
     <td class="tg-14gg">False</td>
-    <td class="tg-14gg"> If template_url is provided it precedes over the template name. 
-    If both template url and name are not provided teflo_scenario_gchat template is used </td>
+    <td class="tg-14gg"> If template_url is provided it precedes over the template name. If both template url and name are not provided teflo_scenario_gchat template is used  as default</td>
   </tr>
   <tr>
     <td class="tg-14gg">slack_template_url</td>
@@ -162,7 +162,7 @@ notifications:
     <td class="tg-14gg">name of the template present on the notify_service server</span> </td>
     <td class="tg-14gg">String </td>
     <td class="tg-14gg">False</td>
-    <td class="tg-14gg"> If template_url is provided it precedes over the template name. If both template url and name are not provided teflo_scenario_slack template is used </td>
+    <td class="tg-14gg"> If template_url is provided it precedes over the template name. If both template url and name are not provided teflo_scenario_slack template is used as default </td>
   </tr>
   <tr>
     <td class="tg-14gg">email_template_url</td>
@@ -176,7 +176,7 @@ notifications:
     <td class="tg-14gg">name of the template present on the notify_service server</span> </td>
     <td class="tg-14gg">String </td>
     <td class="tg-14gg">False</td>
-    <td class="tg-14gg"> If template_url is provided it precedes over the template name. If both template url and name are not provided teflo_scenario_slack template is used </td>
+    <td class="tg-14gg"> If template_url is provided it precedes over the template name. If both template url and name are not provided teflo_scenario_slack template is used as default </td>
   </tr>
   <tr>
     <td class="tg-14gg">email_to</td>
@@ -223,18 +223,46 @@ notifications:
 
 ## Examples
 
+For all the examples the credentials need to be set in the teflo.cfg
+ ```ini
+[credentials:notify_service]
+gchat_url=<gchat webhook url set when sending message to gchat>
+slack_url=<slack webhook url set when sending message to slack>
+service_api=<notify service api>
+token=<unique token to access the service api>
+```
+
 ### Example 1
 
 To send notification to slack,gchat,email,irc, message_bus without the message_bus_request_body on completion of the 
 teflo execute task
 
+Here notification with subject 'Notification using notify service' is sent to the following after execute 
+task completes (here one single api call is made to send notification to all the targets)
+1. **gchat** using the template teflo_scenario_gchat template
+2. **slack** using the template teflo_scenario_slack template
+3. **email** using the raw template url provided
+4. **irc** to #ccit channel
+5. **message bus** with topic "/topic/VirtualTopic.qe.ci.qedevops_teflo.brew-build.test.complete" and no request body
+
 ```yaml
 notifications:
-  - name: msg_template
-    notifier: gchat-notifier
-    credential: webhook
-    on_task: ['provision']
-    message_body: "Provsision task completed" 
+  - name: notify1
+    notifier: notify_service
+    credential: notify_service
+    on_task: ['execute']
+    params:
+      target: 'gchat,email,slack,irc,message_bus'
+      subject: Notification using notify service
+      irc_channel: '#ccit'
+      gchat_template_name: teflo_scenario_gchat
+      slack_template_name: teflo_scenario_slack
+      email_template_name: teflo_scenario_email
+      email_template_url: https://raw.githubusercontent.com/waynesun09/notify-service/main/app/templates/build/teflo_scenario_email.html
+      email_to: ['abcd@redhat.com']
+      message_bus_topic: "/topic/VirtualTopic.qe.ci.qedevops_teflo.brew-build.test.complete"
+      message_body: {"body": { "scenario":  {"name": "notify_service_all", "overall_status": 0},"passed_tasks": ["validate", "provision", "orchestrate"]}}
+    
 ```  
 
 
@@ -243,41 +271,139 @@ notifications:
 To send notification to slack,gchat,email,irc, message_bus with the message_bus_request_body on failure of the
 teflo report task
 
+Here two separate api calls are made to teh notify service one for message_bus and one for all other targets.
+
 ```yaml
 notifications:
-  - name: msg_template
-    notifier: gchat-notifier
-    credential: webhook
-    on_start: true
-    message_template: user_template.txt
+  - name: notify2
+    notifier: notify_service
+    credential: notify_service
+    on_task: ['execute']
+    params:
+      target: 'gchat,email,slack,irc,message_bus'
+      subject: Notification using notify service
+      irc_channel: '#ccit'
+      gchat_template_name: teflo_scenario_gchat
+      slack_template_name: teflo_scenario_slack
+      email_template_name: teflo_scenario_email
+      email_template_url: https://raw.githubusercontent.com/waynesun09/notify-service/main/app/templates/build/teflo_scenario_email.html
+      email_to: ['abcd@redhat.com']
+      message_bus_topic: "/topic/VirtualTopic.qe.ci.qedevops_teflo.brew-build.test.complete"
+      message_body: {"body": { "scenario":  {"name": "notify_service_all", "overall_status": 0},"passed_tasks": ["validate", "provision", "orchestrate"]}}
+      message_bus_request_body: {
+  "headers": {
+    "CI_NAME": "EXAMPLE",
+    "CI_TYPE": "CUSTOM"
+  },
+  "body": {
+    "contact": {
+      "name": "C3I Jenkins",
+      "team": "DevOps_rujuta",
+      "url": "https://example.com",
+      "docs": "https://example.com/user-documentation",
+      "irc": "#some-channel",
+      "email": "someone@example.com"
+    },
+    "run": {
+      "url": "https://somewhere.com/job/ci-job/4794",
+      "log": "https://somewhere.com/job/ci-job/4794/console",
+      "log_raw": "https://somewhere.com/job/ci-job/4794/consoleText",
+      "log_stream": "https://somewhere.com/job/ci-job/4794/consoleText",
+      "debug": "https://somewhere.com/job/ci-job/4794/artifacts/debug.txt",
+      "rebuild": "https://somewhere.com/job/ci-job/4794/rebuild/parametrized"
+    },
+    "artifact": {
+      "type": "container-image",
+      "repository": "someapp",
+      "digest": "sha256:017eb7de7927da933a04a6c1ff59da0c41dcea194aaa6b5dd7148df286b92433",
+      "pull_ref": "docker://registry.fedoraproject.org/someapp@sha256:017eb7de7927da933a04a6c1ff59da0c41dcea194aaa6b5dd7148df286b92433",
+      "source": "git+https://src.fedoraproject.org/rpms/setup.git?#5e0ae23a",
+      "id": "someapp@sha256:017eb7de7927da933a04a6c1ff59da0c41dcea194aaa6b5dd7148df286b92433"
+    },
+    "pipeline": {
+      "id": "ac11dcddf99a",
+      "name": "ci-job"
+    },
+    "test": {
+      "type": "tier1",
+      "category": "functional",
+      "result": "failed",
+      "namespace": "factory2.c3i-ci",
+      "note": "Some notes.",
+      "label": [
+        "fast",
+        "aarch64"
+      ],
+      "xunit": "https://somewhere.com/job/ci-openstack/4794/artifacts/results.xml"
+    },
+    "system": [
+      {
+        "os": "docker.io/openshift/jenkins-slave-base-centos7:latest",
+        "provider": "openshift",
+        "architecture": "x86_64"
+      }
+    ],
+    "notification": {
+      "recipients": [
+        "ovasik",
+        "mvadkert"
+      ]
+    },
+    "generated_at": "2018-05-10 08:58:31.222602",
+    "version": "0.2.1"
+  }
+}
+
 ```
 
 
 ### Example 3
 
-To send notification email,irc on start of all teflo tasks execute task
+To send notification email,irc on start of all teflo tasks
+
+This notifictaion will be sent to email and irc channel at the beginning of every teflo task
 
 
 ```yaml
 notifications:
-  - name: msg1
-    notifier: gchat-notifier
-    credential: webhook
-    on_failure: true
+  - name: notify3
+    notifier: notify_service
+    credential: notify_service
+    on_start: True
+    params:
+      target: 'email,irc'
+      subject: Notification using notify service
+      irc_channel: '#ccit'
+      email_template_url: https://raw.githubusercontent.com/waynesun09/notify-service/main/app/templates/build/teflo_scenario_email.html
+      email_to: ['abcd@redhat.com']
 ```  
 
 
 ### Example 4
 
-To send notification on demand
+To send notification on demand, run the notify command post the teflo run has completed providing the results.yml 
+as the scenario file or can run it anytime using the original SDF
+
+```bash
+teflo notify -s .teflo/.results/results.yml 
+
+or 
+
+teflo notify -s scenario.yml
+
+```
 
 ```yaml
 notifications:
-  - name: msg1
-    notifier: webhook-notifier
-    credential: webhook
-    on_failure: true
-    message_template: differnt_chat_app_template.jinja
+  - name: notify4
+    notifier: notify_service
+    credential: notify_service
+    on_demand: True
+    params:
+      target: 'email,irc,gchat'
+      subject: Notification using notify service
+      gchat_template_name: teflo_scenario_gchat
+      irc_channel: '#ccit'
+      email_template_url: https://raw.githubusercontent.com/waynesun09/notify-service/main/app/templates/build/teflo_scenario_email.html
+      email_to: ['abcd@redhat.com']
 ```    
-
-```
