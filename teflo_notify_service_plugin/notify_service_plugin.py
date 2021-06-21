@@ -22,8 +22,8 @@
     :license: GPLv3, see LICENSE for more details.
 """
 
-# TODO future usecase : to put a template on the notify_service repo using the template put api, so teflo users can put that
-#  repo once and use it agian for other runs > need to ask this
+# TODO future usecase : to put a template on the notify_service repo using the template put api, so teflo users
+#  can put that repo once and use it agian for other runs > need to ask this
 
 from teflo.helpers import template_render, schema_validator, generate_default_template_vars
 from teflo.core import NotificationPlugin
@@ -64,16 +64,6 @@ class NotifyServicePlugin(NotificationPlugin):
         else:
             raise TefloNotifierError("Error finding template %s .error ")
 
-    # def check_target_value(self, target_val):
-    #     types = ['gchat', 'slack', 'email', 'irc', 'message_bus']
-    #     list1 = target_val.replace(' ', '').split(',')
-    #
-    #     if False in [item in types and isinstance(item, str) for item in list1]:
-    #         raise TefloNotifierError("Unknown target value %s found.Target should be one or more "
-    #                                  "of this list: 'gchat,email,slack,irc,message_bus'" % target_val)
-    #     else:
-    #         return
-
     def get_params(self):
         # Create a dictionary with message_bus params and the rest of the target params, if message_request_body is
         # provided. Notify service cannot handle message_bus custom request body when using multi target api
@@ -88,7 +78,7 @@ class NotifyServicePlugin(NotificationPlugin):
                 raise TefloNotifierError("Unknown target value %s found.Target should be one or more "
                                          "of this list: 'gchat,email,slack,irc,message_bus'" % target_val)
 
-            if 'message_bus'in list1:
+            if 'message_bus' in list1:
                 # Creating message_bus params entry in case message_bus_request_body is provided
                 if not self.params.get('message_bus_topic'):
                     raise TefloNotifierError("Message bus topic is required to be set in SDF to "
@@ -127,7 +117,7 @@ class NotifyServicePlugin(NotificationPlugin):
                     continue
                 elif params.get(temp_name) and \
                         self.check_for_template(params.get(temp_name)) == 1:
-                    self.logger.debug("Using %s as the %s template" %(temp_name, item))
+                    self.logger.debug("Using %s as the %s template" % (temp_name, item))
                     continue
                 else:
                     # using default teflo gchat template if no gchat_template url or name is provided
@@ -202,8 +192,9 @@ class NotifyServicePlugin(NotificationPlugin):
             self.logger.debug("Message body is provided by the user. This will be converted into json")
             if isinstance(self.body, str):
                 self.body = str({'text': self.body})
-            elif not isinstance(eval(str(self.body)), dict):
-                    raise TefloNotifierError("The body needs to be in a dictionary or string format %s " % self.body)
+            #elif not isinstance(eval(str(self.body)), dict):
+            elif not isinstance((self.body), dict):
+                raise TefloNotifierError("The body needs to be in a dictionary or string format %s " % self.body)
             return json.dumps(eval(str(self.body)))
 
     def api_call(self, op, api, payload=None):
@@ -221,7 +212,7 @@ class NotifyServicePlugin(NotificationPlugin):
                 self.logger.debug("Notification api call was successful with return code 200")
                 return res.code
             else:
-                raise TefloNotifierError("There was an error sending notification : %s " % data)
+                raise TefloNotifierError("There was an error making the notification api call : %s " % data)
         except Exception as ex:
             raise TefloNotifierError("Error connecting to notify service %s" % ex)
 
@@ -232,7 +223,7 @@ class NotifyServicePlugin(NotificationPlugin):
         api_url = api + encode
 
         self.logger.info("User has provided request body which will be used as payload")
-        #if not isinstance(eval(str(self.params.get('message_bus_request_body'))), dict):
+        # if not isinstance(eval(str(self.params.get('message_bus_request_body'))), dict):
         if not isinstance(self.params.get('message_bus_request_body'), dict):
             raise TefloNotifierError("The message_bus_request_body needs to be in a dictionary format %s " %
                                      self.params.get('message_bus_request_body'))
@@ -254,7 +245,7 @@ class NotifyServicePlugin(NotificationPlugin):
 
         api = self.generate_multi_api_string(input_params.get('targets'))
         payload = self.generate_multi_api_payload()
-        if self.api_call("POST", api, payload) :
+        if self.api_call("POST", api, payload):
             self.logger.info("Notification successful for multi api ")
 
     def validate(self):
@@ -263,6 +254,3 @@ class NotifyServicePlugin(NotificationPlugin):
                          schema_creds=self.creds_params,
                          schema_files=[self.__schema_file_path__],
                          schema_ext_files=[self.__schema_ext_path__])
-
-
-
