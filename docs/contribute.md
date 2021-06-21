@@ -10,7 +10,7 @@ best practices before submitting changes.
 ## Branch Model
 We follow a git-flow type of model. Currently there are two branches
 * Develop - where all current work is done
-* Master - stable release
+* Main - stable release
 
 Both branches are protected in github. We do not allow commits directly to either branch. Only the maintainers
 are allowed to cut a release and request a merge of `develop` into `master`. 
