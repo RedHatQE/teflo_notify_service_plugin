@@ -51,7 +51,6 @@ class NotifyServicePlugin(NotificationPlugin):
         self.gchat_url = self.creds_params.get('gchat_url', None)
         self.slack_url = self.creds_params.get('slack_url', None)
         self.token = self.creds_params.get('token', None)
-
         self.create_logger(name='teflo_notify_service_plugin', data_folder=self.config.get('DATA_FOLDER'))
         self.params = getattr(self.notification, 'params')
         self.body = getattr(self.notification, 'message_body', None)
@@ -192,8 +191,7 @@ class NotifyServicePlugin(NotificationPlugin):
             self.logger.debug("Message body is provided by the user. This will be converted into json")
             if isinstance(self.body, str):
                 self.body = str({'text': self.body})
-            #elif not isinstance(eval(str(self.body)), dict):
-            elif not isinstance((self.body), dict):
+            elif not isinstance(self.body, dict):
                 raise TefloNotifierError("The body needs to be in a dictionary or string format %s " % self.body)
             return json.dumps(eval(str(self.body)))
 
@@ -223,7 +221,6 @@ class NotifyServicePlugin(NotificationPlugin):
         api_url = api + encode
 
         self.logger.info("User has provided request body which will be used as payload")
-        # if not isinstance(eval(str(self.params.get('message_bus_request_body'))), dict):
         if not isinstance(self.params.get('message_bus_request_body'), dict):
             raise TefloNotifierError("The message_bus_request_body needs to be in a dictionary format %s " %
                                      self.params.get('message_bus_request_body'))
