@@ -54,6 +54,7 @@ notifications:
   - name: test_notify_service
     notifier: notify_service
     credential: notify_service
+    message_body: {"body": { "scenario":  {"name": "notify_service_all", "overall_status": 0},"passed_tasks": ["validate", "provision", "orchestrate"]}}
     params:
       target: 'gchat,email,slack,irc,message_bus'
       subject: Notification on demand
@@ -64,7 +65,7 @@ notifications:
       email_to: ['rushinde@redhat.com']
       message_bus_topic: "/topic/VirtualTopic.qe.ci.qedevops_teflo.brew-build.test.complete"
       message_bus_request_body: {'body': 'text1'}
-      message_body: {"body": { "scenario":  {"name": "notify_service_all", "overall_status": 0},"passed_tasks": ["validate", "provision", "orchestrate"]}}
+      
       .
       .
       .  
@@ -97,8 +98,14 @@ notifications:
     <td class="tg-8m83">True</td>
   </tr>
   <tr>
+    <td class="tg-14gg">message_body</td>
+    <td class="tg-14gg">Body of the message to be sent</span> </td>
+    <td class="tg-14gg">String/Dict</td>
+    <td class="tg-14gg">False. If not provided a default message body is used</td>
+  </tr>
+  <tr>
     <td class="tg-14gg">params</td>
-    <td class="tg-14gg">A dictionary of parameters used by the notify service</span> key</td>
+    <td class="tg-14gg">A dictionary of parameters used by the notify service rest multi api</span> key</td>
     <td class="tg-14gg">Dictionary</td>
     <td class="tg-14gg">True</td>
   </tr>
@@ -200,13 +207,6 @@ notifications:
     <td class="tg-14gg"> If provided a separet api call is made to send notification to the UMB. 
     If not provided a single api call is made with all the targets included</td>
   </tr>
-    <tr>
-    <td class="tg-14gg">message_body</td>
-    <td class="tg-14gg">Body of the message to be sent</span> </td>
-    <td class="tg-14gg">String/Dict</td>
-    <td class="tg-14gg">False</td>
-    <td class="tg-14gg"> If not provided a default message body is used</td>
-  </tr>
   </table>
    
   **Note**
@@ -251,6 +251,7 @@ notifications:
     notifier: notify_service
     credential: notify_service
     on_task: ['execute']
+    message_body: {"body": { "scenario":  {"name": "notify_service_all", "overall_status": 0},"passed_tasks": ["validate", "provision", "orchestrate"]}}
     params:
       target: 'gchat,email,slack,irc,message_bus'
       subject: Notification using notify service
@@ -261,7 +262,7 @@ notifications:
       email_template_url: https://raw.githubusercontent.com/waynesun09/notify-service/main/app/templates/build/teflo_scenario_email.html
       email_to: ['abcd@redhat.com']
       message_bus_topic: "/topic/VirtualTopic.qe.ci.qedevops_teflo.brew-build.test.complete"
-      message_body: {"body": { "scenario":  {"name": "notify_service_all", "overall_status": 0},"passed_tasks": ["validate", "provision", "orchestrate"]}}
+      
     
 ```  
 
@@ -279,6 +280,7 @@ notifications:
     notifier: notify_service
     credential: notify_service
     on_task: ['execute']
+    message_body: {"body": { "scenario":  {"name": "notify_service_all", "overall_status": 0},"passed_tasks": ["validate", "provision", "orchestrate"]}}
     params:
       target: 'gchat,email,slack,irc,message_bus'
       subject: Notification using notify service
@@ -289,7 +291,6 @@ notifications:
       email_template_url: https://raw.githubusercontent.com/waynesun09/notify-service/main/app/templates/build/teflo_scenario_email.html
       email_to: ['abcd@redhat.com']
       message_bus_topic: "/topic/VirtualTopic.qe.ci.qedevops_teflo.brew-build.test.complete"
-      message_body: {"body": { "scenario":  {"name": "notify_service_all", "overall_status": 0},"passed_tasks": ["validate", "provision", "orchestrate"]}}
       message_bus_request_body: {
   "headers": {
     "CI_NAME": "EXAMPLE",
