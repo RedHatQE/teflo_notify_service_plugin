@@ -28,6 +28,7 @@
 
 import pytest
 import mock
+import json
 import os
 from teflo_notify_service_plugin import NotifyServicePlugin
 from teflo.resources import Notification, Scenario
@@ -43,11 +44,12 @@ def config():
     config.load()
     return config
 
+
 @pytest.fixture()
 def scenario_resource(config):
     sc = Scenario(config=config, parameters={'name': 'test_scenario'})
-    setattr(sc, 'passed_tasks', ['validate'])
-    setattr(sc, 'failed_tasks', [])
+    setattr(sc, 'passed_tasks', ['provision', 'execute'])
+    setattr(sc, 'failed_tasks', ['report'])
     setattr(sc, 'overall_status', 0)
     return sc
 
@@ -58,7 +60,7 @@ def params():
         description='description goes here.',
         notifier='notify_service',
         credential='notify_service',
-        on_start=True,
+        on_start=False,
         params={'message_bus_request_body': {'body': 'message1'}, 'target':'gchat,message_bus'}
     )
     return params
@@ -67,9 +69,6 @@ def params():
 @pytest.fixture()
 def notification(params, config, scenario_resource):
     note = Notification(name='notify1', parameters=params,  config=getattr(scenario_resource, 'config'))
-    setattr(scenario_resource, 'passed_tasks', ['provision'])
-    setattr(scenario_resource, 'failed_tasks', [])
-    setattr(scenario_resource, 'overall_status', 0)
     scenario_resource.add_notifications(note)
     note.scenario = scenario_resource
     return note
@@ -129,3 +128,40 @@ class TestNotifyServicePlugin(object):
         notify_service_plugin.params.update({'message_bus_request_body': None})
         results = notify_service_plugin.get_params()
         assert results['targets'] == {'target': 'gchat,message_bus', 'message_bus_topic': 'topic1'}
+
+    @staticmethod
+    @mock.patch('teflo_notify_service_plugin.NotifyServicePlugin.api_call')
+    def test_with_wrong_template_name(mock, notify_service_plugin):
+        mock.return_value = None
+        notify_service_plugin.params.update({'gchat_template_name': 'gchat1'})
+        with pytest.raises(TefloNotifierError) as ex:
+            notify_service_plugin.check_for_template(notify_service_plugin.params['gchat_template_name'])
+        assert "Error finding template %s .error " in ex.value.args
+
+    @staticmethod
+    def test_generate_multi_api_payload_when_msgbody_not_provided(notify_service_plugin):
+        result = json.loads(notify_service_plugin.generate_multi_api_payload())
+        assert result['body']['passed_tasks'] == 'provision,execute'
+        assert result['body']['failed_tasks'] == 'report'
+
+    @staticmethod
+    def test_generate_multi_api_payload_when_msgbody_is_string(notification):
+        setattr(notification, 'message_body', 'this is message body')
+        ns_plugin = NotifyServicePlugin(notification)
+        result = json.loads(ns_plugin.generate_multi_api_payload())
+        assert result == {'text': 'this is message body'}
+
+    @staticmethod
+    def test_generate_multi_api_payload_when_msgbody_is_dict(notification):
+        setattr(notification, 'message_body', {'body': 'hello teflo user'})
+        ns_plugin = NotifyServicePlugin(notification)
+        result = json.loads(ns_plugin.generate_multi_api_payload())
+        assert result == {'body': 'hello teflo user'}
+
+    @staticmethod
+    def test_generate_multi_api_payload_when_msgbody_is_incorrect(notification):
+        setattr(notification, 'message_body', ['body', 'hello teflo user'])
+        ns_plugin = NotifyServicePlugin(notification)
+        with pytest.raises(TefloNotifierError) as ex:
+            json.loads(ns_plugin.generate_multi_api_payload())
+        assert "The body needs to be in a dictionary or string format ['body', 'hello teflo user'] " in ex.value.args
