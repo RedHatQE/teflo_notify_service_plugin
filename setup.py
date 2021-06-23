@@ -13,8 +13,8 @@ def get_version():
     return VERSION_RE.search(init).group(1)
 
 
-# reading description from README.rst
-with io.open(os.path.join(ROOT, 'docs', 'index.md'), encoding='utf-8') as f:
+# reading description from README.md
+with io.open(os.path.join(ROOT, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
