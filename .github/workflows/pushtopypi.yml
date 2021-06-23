@@ -3,7 +3,7 @@ name: "Push master to pypi on version change"
 on:
   push:
     branches:
-      - master
+      - main
     paths:
       - 'teflo_notify_service_plugin/__init__.py'
 
