@@ -24,5 +24,5 @@
 
 from .notify_service_plugin import NotifyServicePlugin
 
-__version__ = '0.0.2'
+__version__ = '0.0.3'
 __author__ = 'Red Hat Inc.'

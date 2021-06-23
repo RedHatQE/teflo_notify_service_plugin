@@ -1,17 +1,5 @@
-# Version 
+# Version 0.0.3 (06-28-2021)
 
 ## New features
-* None
-
-## Enhancements
-* None
-
-## Bug Fixes
-* None
-
-## Doc Changes
-* None
-
-## Test/CI Enhancements
-* None
+* First release
 
