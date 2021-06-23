@@ -23,7 +23,7 @@ $ pip install teflo_notify_service_plugin==<tagged_version>
 OR
 
 ```bash
-$ pip install https://github.com/RedHatQE/teflo_notify_service_plugin.git@<tagged_version>
+$ pip install git+https://github.com/RedHatQE/teflo_notify_service_plugin.git@<tagged_version>
 ```
 
 ## Credentials
