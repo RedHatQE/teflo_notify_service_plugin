@@ -1,6 +1,17 @@
-# User Guide
+---
+layout: default
+title: User Guide
+nav_order: 2
+---
 
-### To return to documentation home page press [here](https://redhatqe.github.io/teflo_notify_service_plugin/index.html).
+# User Guide
+{: .no_toc }
+
+## Table of contents
+{: .no_toc .text-delta }
+
+1. TOC
+{:toc}
 
 ## Installation
 
