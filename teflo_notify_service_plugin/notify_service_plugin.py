@@ -155,9 +155,9 @@ class NotifyServicePlugin(NotificationPlugin):
             data['body']['scenario']['overall_status'] = self.scenario.overall_status
             data['body']['passed_tasks'] = temp_var.get('passed_tasks')
             data['body']['failed_tasks'] = temp_var.get('failed_tasks')
-            if self.scenario.get_all_executes():
+            if self.scenario.get_executes():
                 data['body']['scenario']['executes'] = list()
-                for exe in self.scenario.get_all_executes():
+                for exe in self.scenario.get_executes():
                     exe_dict = dict()
                     exe_dict['name'] = exe.name
                     if exe.testrun_results:
@@ -170,9 +170,9 @@ class NotifyServicePlugin(NotificationPlugin):
                         exe_dict['testrun_results']['aggregate_testrun_results'][
                             'skipped_tests'] = exe.testrun_results.aggregate_testrun_results.skipped_tests
                     data['body']['scenario']['executes'].append(exe_dict)
-            if self.scenario.get_all_reports():
+            if self.scenario.get_reports():
                 data['body']['scenario']['reports'] = list()
-                for rep in self.scenario.get_all_reports():
+                for rep in self.scenario.get_reports():
                     rep_dict = dict()
                     rep_dict['name'] = rep.name
                     rep_dict['importer_plugin_name'] = rep.importer_plugin_name
