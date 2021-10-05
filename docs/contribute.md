@@ -1,6 +1,17 @@
-# Notify Service Plugin Development Guide
+---                                                                             
+layout: default                                                                 
+title: Development Guide
+nav_order: 3
+---                                                                             
 
-### To return to documentation home page press [here](https://redhatqe.github.io/teflo_notify_service_plugin/index.html).
+# Development Guide                                                                    
+{: .no_toc }                                                                    
+
+## Table of contents                                                            
+{: .no_toc .text-delta }                                                        
+
+1. TOC                                                                          
+{:toc}    
 
 The plugin team welcomes your contributions to the project. 
 Please use this document as a guide to working on proposed changes to Notify Service Plugin. 

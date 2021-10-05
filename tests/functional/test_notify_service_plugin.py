@@ -34,6 +34,7 @@ from teflo_notify_service_plugin import NotifyServicePlugin
 from teflo.resources import Notification, Scenario
 from teflo.exceptions import TefloNotifierError
 from teflo.utils.config import Config
+from termcolor import colored
 
 
 @pytest.fixture()
@@ -103,16 +104,16 @@ class TestNotifyServicePlugin(object):
         with pytest.raises(TefloNotifierError) as ex:
             notify_service_plugin.notify()
 
-        assert "At least one Target(gchat/email/slack/irs/message_bus) are required to send " \
-               "notifications using the Notify Service" in ex.value.args
+        assert colored( "At least one Target(gchat/email/slack/irs/message_bus) are required to send "
+               "notifications using the Notify Service", "red") in ex.value.args
 
     @staticmethod
     def test_with_incorrect_target(notify_service_plugin):
         notify_service_plugin.params.update({'target': 'hello'})
         with pytest.raises(TefloNotifierError) as ex:
             notify_service_plugin.notify()
-        assert "Unknown target value hello found.Target should be one or more of this list:" \
-               " 'gchat,email,slack,irc,message_bus'"in ex.value.args
+        assert colored("Unknown target value hello found.Target should be one or more of this list:"
+               " 'gchat,email,slack,irc,message_bus'", "red")in ex.value.args
 
     @staticmethod
     def test_get_params_with_message_bus_request_body(notify_service_plugin):
@@ -136,7 +137,7 @@ class TestNotifyServicePlugin(object):
         notify_service_plugin.params.update({'gchat_template_name': 'gchat1'})
         with pytest.raises(TefloNotifierError) as ex:
             notify_service_plugin.check_for_template(notify_service_plugin.params['gchat_template_name'])
-        assert "Error finding template %s .error " in ex.value.args
+        assert colored("Error finding template %s .error ", "red") in ex.value.args
 
     @staticmethod
     def test_generate_multi_api_payload_when_msgbody_not_provided(notify_service_plugin):
@@ -164,4 +165,6 @@ class TestNotifyServicePlugin(object):
         ns_plugin = NotifyServicePlugin(notification)
         with pytest.raises(TefloNotifierError) as ex:
             json.loads(ns_plugin.generate_multi_api_payload())
-        assert "The body needs to be in a dictionary or string format ['body', 'hello teflo user'] " in ex.value.args
+            colored(message, "red")
+        assert colored("The body needs to be in a dictionary or string format ['body', 'hello teflo user'] ", "red")\
+               in ex.value.args
