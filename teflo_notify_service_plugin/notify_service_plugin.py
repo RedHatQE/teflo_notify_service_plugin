@@ -45,6 +45,7 @@ class NotifyServicePlugin(NotificationPlugin):
         super(NotifyServicePlugin, self).__init__(notification=notification)
 
         self.scenario = getattr(self.notification, 'scenario')
+        self.scenario_graph = getattr(self.scenario, 'scenario_graph')
         self.config_params = self.get_config_params()
         self.creds_params = self.get_credential_params()
         self.service_api = self.creds_params.get('service_api', None)
@@ -150,6 +151,7 @@ class NotifyServicePlugin(NotificationPlugin):
             temp_var = generate_default_template_vars(self.scenario, self.notification)
             data = dict()
             data.update({"body": {}})
+            data['body']['scenario_vars'] = temp_var.get('scenario_vars') if temp_var.get('scenario_vars') else dict()
             data['body']['scenario'] = dict()
             data['body']['scenario']['name'] = self.scenario.name
             data['body']['scenario']['overall_status'] = self.scenario.overall_status

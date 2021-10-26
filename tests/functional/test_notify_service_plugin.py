@@ -34,6 +34,7 @@ from teflo_notify_service_plugin import NotifyServicePlugin
 from teflo.resources import Notification, Scenario
 from teflo.exceptions import TefloNotifierError
 from teflo.utils.config import Config
+from teflo.utils.scenario_graph import ScenarioGraph
 from termcolor import colored
 
 
@@ -55,6 +56,11 @@ def scenario_resource(config):
     return sc
 
 @pytest.fixture()
+def scenario_graph(scenario_resource):
+    sg = ScenarioGraph(root_scenario=scenario_resource, scenario_vars= {'username': 'teflo_user'})
+    return sg
+
+@pytest.fixture()
 def params():
 
     params = dict(
@@ -68,7 +74,8 @@ def params():
 
 
 @pytest.fixture()
-def notification(params, config, scenario_resource):
+def notification(params, config, scenario_resource, scenario_graph):
+    setattr(scenario_resource, 'scenario_graph', scenario_graph)
     note = Notification(name='notify1', parameters=params,  config=getattr(scenario_resource, 'config'))
     scenario_resource.add_notifications(note)
     note.scenario = scenario_resource
