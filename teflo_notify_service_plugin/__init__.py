@@ -23,6 +23,6 @@
 """
 
 from .notify_service_plugin import NotifyServicePlugin
-
 __version__ = '2.0.1'
+
 __author__ = 'Red Hat Inc.'
